@@ -13,3 +13,9 @@ variable "vpc_b_cidr" {
 variable "azs" {
   default = ["eu-north-1a", "eu-north-1b", "eu-north-1c"]
 }
+
+variable "replica_count" {
+  type    = number
+  default = 1
+
+}

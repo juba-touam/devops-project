@@ -1,5 +1,5 @@
 resource "aws_route53_zone" "internal" {
-  name = "internal.jubat.local"
+  name    = "internal.jubat.local"
   comment = "Zone DNS privée pour les services internes"
 
   vpc {

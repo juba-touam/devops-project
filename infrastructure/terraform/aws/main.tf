@@ -9,10 +9,10 @@ terraform {
   }
   backend "s3" {
     # Configuration du backend S3
-    bucket = "devops-tf-backend-jb"
-    key            = "landing-zone/terraform.tfstate"
-    region         = "eu-north-1"
-    encrypt        = true
+    bucket  = "devops-tf-backend-jb"
+    key     = "landing-zone/terraform.tfstate"
+    region  = "eu-north-1"
+    encrypt = true
   }
 }
 
