@@ -1,7 +1,7 @@
 #subnet utilisé
 resource "aws_db_subnet_group" "rds" {
   name       = "app-rds-subnets"
-  subnet_ids = module.vpc_a.private_subnets
+  subnet_ids = data.terraform_remote_state.network.outputs.vpc_a_public_subnets
 }
 
 #secret manager
@@ -30,9 +30,10 @@ resource "aws_db_instance" "primary" {
   multi_az               = true
   publicly_accessible    = false
   db_subnet_group_name   = aws_db_subnet_group.rds.name
-  vpc_security_group_ids = [aws_security_group.db_sg.id]
+  vpc_security_group_ids = [data.terraform_remote_state.network.outputs.db_sg_id]
 
   backup_retention_period = 7
+  deletion_protection = false
 }
 
 #Read replicas
@@ -47,13 +48,13 @@ resource "aws_db_instance" "replica" {
   skip_final_snapshot = true
 
   db_subnet_group_name   = aws_db_subnet_group.rds.name
-  vpc_security_group_ids = [aws_security_group.db_sg.id]
+  vpc_security_group_ids = [data.terraform_remote_state.network.outputs.db_sg_id]
 }
 
 
 resource "aws_db_snapshot" "pre_deploy" {
   db_instance_identifier = aws_db_instance.primary.identifier
-  db_snapshot_identifier = "app-predeploy"
+  db_snapshot_identifier = "app-predeploy-${replace(timestamp(), ":", "-")}"
   depends_on = [aws_db_instance.primary]
   tags                   = { Purpose = "pre-deploy" }
 }
