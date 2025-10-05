@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: user-service-api
+    version: 1.0.0
+  datasource:
+    url: jdbc:postgresql://user-service-db:5432/postgres
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  cache:
+    type: redis
+    redis:
+      key-prefix: "user-service-api::"
+      time-to-live: 10m
+      use-key-prefix: true
+      cache-null-values: false
+
+  data:
+    redis:
+      host: cache
+      port: 6379
+
+  jpa:
+    hibernate:
+      ddl-auto: update   # create, create-drop, update, validate, none
+    properties:
+      hibernate:
+        default_schema: public
