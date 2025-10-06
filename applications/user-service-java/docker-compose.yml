@@ -1,29 +1,60 @@
-version: "3.9"
 services:
   user-service-db:
     image: postgres:17
     container_name: user-service-db
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=postgres
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports: ["5432:5432"]
+    networks: [dev-kafka-net]
+
+
   cache:
     image: redis:7.0.0-alpine
     container_name: cache
     command: ["redis-server", "--appendonly", "yes"]
+    ports: ["6379:6379"]
+    networks: [dev-kafka-net]
+
+
+  kafka:
+    image: redpandadata/redpanda:latest
+    container_name: kafka
+    command:
+      - redpanda
+      - start
+      - --overprovisioned
+      - --smp=1
+      - --memory=512M
+      - --reserve-memory=0M
+      - --node-id=0
+      - --check=false
+      - --kafka-addr=PLAINTEXT://0.0.0.0:9092
+      - --advertise-kafka-addr=PLAINTEXT://kafka:9092
+      - --rpc-addr=0.0.0.0:33145
+      - --advertise-rpc-addr=kafka:33145
     ports:
-      - "6379:6379"
+      - "9092:9092"
+    networks: [ dev-kafka-net ]
+    restart: unless-stopped
 
 
   user-service-api:
     build:
       context: .
-      dockerfile: Dockerfile
     container_name: user-service-api
-    ports:
-      - "8080:8080"
+    ports: ["8080:8080"]
+    environment:
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - APP_KAFKA_TOPIC_ORDERS=orders.create.v1
     depends_on:
       - user-service-db
       - cache
+      - kafka
+    networks: [dev-kafka-net]
+
+
+networks:
+  dev-kafka-net:
+    external: true

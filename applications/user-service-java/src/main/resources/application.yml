@@ -2,6 +2,7 @@ spring:
   application:
     name: user-service-api
     version: 1.0.0
+
   datasource:
     url: jdbc:postgresql://user-service-db:5432/postgres
     username: postgres
@@ -23,7 +24,22 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update   # create, create-drop, update, validate, none
+      ddl-auto: update
     properties:
       hibernate:
         default_schema: public
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    admin:
+      fail-fast: false
+    properties:
+      spring.json.add.type.headers: false
+
+app:
+  kafka:
+    topic:
+      orders: ${APP_KAFKA_TOPIC_ORDERS:orders.create.v1}
