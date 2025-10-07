@@ -1,0 +1,21 @@
+{
+  "name": "order-service-node",
+  "version": "1.0.0",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.901.0",
+    "@aws-sdk/lib-dynamodb": "^3.901.0",
+    "express": "^4.19.2",
+    "uuid": "^13.0.0",
+    "kafkajs": "^2.2.4"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.5",
+    "nodemon": "^3.1.0"
+  }
+}

@@ -1,0 +1,32 @@
+services:
+  order-service-db:
+    image: amazon/dynamodb-local:latest
+    command: [ "-jar","DynamoDBLocal.jar","-sharedDb","-dbPath","/home/dynamodblocal/data" ]
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./docker/dynamodb:/home/dynamodblocal/data
+    networks: [ dev-kafka-net ]
+
+  order-service-api:
+    build: .
+    ports:
+      - "4000:3000"
+    environment:
+      - PORT=3000
+      - USE_DYNAMODB=true
+      - DYNAMODB_ENDPOINT=http://order-service-db:8000
+      - AWS_ACCESS_KEY_ID=dummy
+      - AWS_SECRET_ACCESS_KEY=dummy
+      - AWS_REGION=us-east-1
+      - DYNAMODB_TABLE=Orders
+      - KAFKA_BROKERS=kafka:9092
+      - KAFKA_GROUP_ID=order-service-consumer
+      - KAFKA_TOPIC_ORDERS=orders.create.v1
+    depends_on:
+      - order-service-db
+    networks: [ dev-kafka-net ]
+    restart: unless-stopped
+networks:
+  dev-kafka-net:
+    external: true
